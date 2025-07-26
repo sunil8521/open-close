@@ -21,8 +21,6 @@ import {
   makeContractCall,
   broadcastTransaction,
 } from "@stacks/transactions";
-import { openContractCall } from "@stacks/connect";
-// import { StacksTestnet } from "@stacks/network";
 import { uintCV, stringAsciiCV } from "@stacks/transactions";
 import { STACKS_TESTNET } from "@stacks/network";
 const Postbounty = () => {
@@ -59,14 +57,12 @@ const Postbounty = () => {
 
     try {
       const transaction = await makeContractCall(txOptions);
-      console.log("1", transaction);
       const result = await broadcastTransaction({ transaction });
       console.log("Transaction broadcasted. TxID:", result.txid);
     } catch (err) {
       console.error("Broadcast error:", err);
     }
    
-    console.log("hello");
   };
 
   return (
