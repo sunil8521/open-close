@@ -10,11 +10,10 @@ path = 'contracts/bounty.clar'
 clarity_version = 3
 epoch = 3.1
 
-# Commenting out or removing this will prevent Clarinet from trying to load it:
-# [contracts.counter]
-# path = 'contracts/counter.clar'
-# clarity_version = 1
-# epoch = 2.05
+# [contracts.test]
+# path = 'contracts/test.clar'
+# clarity_version = 3
+# epoch = 3.1
 [repl.analysis]
 passes = ['check_checker']
 

@@ -12,7 +12,7 @@ import React from 'react'
         <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
           Secure Web3 Projects
           <br />
-          <span className="text-gray-600">Through Bug Bounties</span>
+          <span className="text-gray-600">Through Git Bounties</span>
         </h1>
         <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
           Connect security researchers with Web3 projects. Find vulnerabilities, earn STX rewards, and help build a more

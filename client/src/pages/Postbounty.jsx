@@ -20,9 +20,12 @@ import {
   Cl,
   makeContractCall,
   broadcastTransaction,
+  stringAsciiCV,
+  uintCV,
+  AnchorMode
 } from "@stacks/transactions";
-import { uintCV, stringAsciiCV } from "@stacks/transactions";
-import { STACKS_TESTNET } from "@stacks/network";
+import { openContractCall } from '@stacks/connect';
+// import { StacksTestnet } from '@stacks/network';
 const Postbounty = () => {
   const [formData, setFormData] = useState({
     title: "",
@@ -34,6 +37,7 @@ const Postbounty = () => {
   });
 
   const { isConnected } = useSelector((state) => state.wallet);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isConnected) {
@@ -41,28 +45,27 @@ const Postbounty = () => {
       return;
     }
 
-    // Handle form submission
-    const offchainRef = await saveOffchainBounty(formData);
-    console.log(offchainRef);
+    // const offchainRef = await saveOffchainBounty(formData);
+    // console.log(offchainRef);
+    const functionArgs = [Cl.uint(1),Cl.stringAscii("BXzAxCOeSILIK4Ifaqfa")];
 
-    const functionArgs = [Cl.uint(1), Cl.stringAscii(offchainRef)];
-    console.log(functionArgs);
-    const txOptions = {
+    try {
+      const transaction = await makeContractCall({
       contractAddress: "ST24PT28CZ0M6PKFWRNMTHVQSF8ZKCFQ6EEBGM2AP",
-      contractName: "bounty",
+      contractName: "bounty",  //create-bounty
       functionName: "create-bounty",
       functionArgs,
       network:"testnet",
-    };
-
-    try {
-      const transaction = await makeContractCall(txOptions);
+      senderKey:"42c5f0a309c53025cdf7bf09a1544f3b91f932f396dfababa2e52daea7b230c301",
+      anchorMode: AnchorMode.Any,
+    });
+      // console.log(transaction)
       const result = await broadcastTransaction({ transaction });
       console.log("Transaction broadcasted. TxID:", result.txid);
     } catch (err) {
       console.error("Broadcast error:", err);
     }
-   
+  
   };
 
   return (
@@ -93,7 +96,7 @@ const Postbounty = () => {
                   setFormData({ ...formData, title: e.target.value })
                 }
                 className="mt-1"
-                required
+                // required
               />
             </div>
 
@@ -107,7 +110,7 @@ const Postbounty = () => {
                   setFormData({ ...formData, description: e.target.value })
                 }
                 className="mt-1 min-h-[120px]"
-                required
+                // required
               />
             </div>
 
@@ -122,7 +125,7 @@ const Postbounty = () => {
                   setFormData({ ...formData, githubRepo: e.target.value })
                 }
                 className="mt-1"
-                required
+                // required
               />
             </div>
 
@@ -138,7 +141,7 @@ const Postbounty = () => {
                     setFormData({ ...formData, reward: e.target.value })
                   }
                   className="mt-1"
-                  required
+                  // required
                 />
               </div>
 
@@ -172,7 +175,7 @@ const Postbounty = () => {
                   setFormData({ ...formData, deadline: e.target.value })
                 }
                 className="mt-1"
-                required
+                // required
               />
             </div>
 
