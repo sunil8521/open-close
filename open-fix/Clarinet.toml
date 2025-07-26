@@ -1,0 +1,29 @@
+[project]
+name = 'open-fix'
+description = ''
+authors = []
+telemetry = true
+cache_dir = './.cache'
+requirements = []
+[contracts.bounty]
+path = 'contracts/bounty.clar'
+clarity_version = 3
+epoch = 3.1
+
+# Commenting out or removing this will prevent Clarinet from trying to load it:
+# [contracts.counter]
+# path = 'contracts/counter.clar'
+# clarity_version = 1
+# epoch = 2.05
+[repl.analysis]
+passes = ['check_checker']
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
+
+[repl.remote_data]
+enabled = false
+api_url = 'https://api.hiro.so'
