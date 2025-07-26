@@ -11,165 +11,124 @@ import {
   uintCV,
 } from "@stacks/transactions";
 
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "@/db/firebase"; // Adjust path based on your project
+
 const Bounties = () => {
   const contractAddress = "ST24PT28CZ0M6PKFWRNMTHVQSF8ZKCFQ6EEBGM2AP";
   const contractName = "bounty";
-  const functionName = "get-bounty-counter";
-  const [total, setTotal] = useState(0);
-  const [bountiess, setBounties] = useState([]);
+  const [bounties, setBounties] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const render = async () => {
-      const response = await fetchCallReadOnlyFunction({
-        contractAddress,
-        contractName,
-        functionName,
-        functionArgs: [],
-        senderAddress: "ST24PT28CZ0M6PKFWRNMTHVQSF8ZKCFQ6EEBGM2AP",
-        network: "testnet",
-      });
-      const balance = cvToValue(response);
-      console.log(balance);
-      const total = parseInt(balance.value);
-      setTotal(balance.value);
-      const bountyPromises = [];
-
-      for (let i = 1; i <= total; i++) {
-        const res = await fetchCallReadOnlyFunction({
-          contractAddress: "ST24PT28CZ0M6PKFWRNMTHVQSF8ZKCFQ6EEBGM2AP",
-          contractName: "bounty",
-          functionName: "get-bounty",
-          functionArgs: [uintCV(balance.value)],
-          senderAddress: "ST24PT28CZ0M6PKFWRNMTHVQSF8ZKCFQ6EEBGM2AP",
+    const fetchBounties = async () => {
+      setLoading(true);
+      try {
+        const response = await fetchCallReadOnlyFunction({
+          contractAddress,
+          contractName,
+          functionName: "get-bounty-counter",
+          functionArgs: [],
+          senderAddress: contractAddress,
           network: "testnet",
         });
-        const b = cvToValue(res);
-        bountyPromises.push(b.value["offchain-ref"].value);
+
+        const balance = cvToValue(response);
+        const total = parseInt(balance.value);
+        const bountyData = [];
+
+        for (let i = 1; i <= total; i++) {
+          const res = await fetchCallReadOnlyFunction({
+            contractAddress,
+            contractName,
+            functionName: "get-bounty",
+            functionArgs: [uintCV(i)],
+            senderAddress: contractAddress,
+            network: "testnet",
+          });
+
+          const b = cvToValue(res);
+          const refId = b.value["offchain-ref"].value;
+          const reward = b.value["reward"].value;
+
+          // Fetch from Firebase using offchain-ref
+          const docRef = doc(db, "bounties", refId);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            bountyData.push({ id: i,reward, ...docSnap.data() });
+          }
+        }
+
+        setBounties(bountyData);
+      } catch (err) {
+        console.error("Error fetching bounties:", err);
+      } finally {
+        setLoading(false);
       }
-
-      //  const bountyPromises = [];
-
-      // for (let i = 1; i <= total; i++) {
-      //   const p = fetchCallReadOnlyFunction({
-      //     contractAddress,
-      //     contractName,
-      //     functionName: "get-bounty",
-      //     functionArgs: [uintCV(i)],
-      //     senderAddress: contractAddress,
-      //     network:"testnet",
-      //   }).then((res) => {
-      //     const val = cvToValue(res);
-      //     console.log(val)
-      //     return { id: i, ...val };
-      //   });
-      // }
-      // const bountyList = await Promise.all(bountyPromises);
-      // setBounties(bountyList);
     };
 
-    render();
-  });
+    fetchBounties();
+  }, []);
 
-  const bounties = [
-    {
-      id: 1,
-      title: "Smart Contract Vulnerability in DeFi Protocol",
-      reward: 500,
-      postedDate: "2024-01-15",
-      tags: ["Smart Contract", "DeFi", "Critical"],
-      description:
-        "Looking for potential vulnerabilities in our lending protocol smart contracts.",
-    },
-    {
-      id: 2,
-      title: "Frontend Security Issues in Wallet Interface",
-      reward: 250,
-      postedDate: "2024-01-14",
-      tags: ["Frontend", "Security", "Medium"],
-      description:
-        "Review wallet interface for potential security vulnerabilities and UX issues.",
-    },
-    {
-      id: 3,
-      title: "API Endpoint Security Review",
-      reward: 150,
-      postedDate: "2024-01-13",
-      tags: ["API", "Backend", "Low"],
-      description:
-        "Comprehensive security review of our REST API endpoints and authentication.",
-    },
-    {
-      id: 4,
-      title: "Cross-Chain Bridge Audit",
-      reward: 1000,
-      postedDate: "2024-01-12",
-      tags: ["Bridge", "Cross-Chain", "Critical"],
-      description:
-        "Security audit of our cross-chain bridge implementation for asset transfers.",
-    },
-  ];
-  return (
-    <>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex justify-between items-center mb-12">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Bug Bounties
-            </h1>
-            <p className="text-gray-600">
-              Find and fix vulnerabilities to earn STX rewards
-            </p>
-          </div>
-          <Link to="/post-bounty">
-            <Button>Post New Bounty</Button>
-          </Link>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {bounties.map((bounty) => (
-            <Card
-              key={bounty.id}
-              className="hover:shadow-lg transition-shadow duration-200"
-            >
-              <CardHeader>
-                <div className="flex justify-between items-start mb-2">
-                  <CardTitle className="text-lg leading-tight">
-                    {bounty.title}
-                  </CardTitle>
-                </div>
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
-                  <div className="flex items-center space-x-1">
-                    <Coins className="h-4 w-4" />
-                    <span>{bounty.reward} STX</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{bounty.postedDate}</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4 line-clamp-2">
-                  {bounty.description}
-                </p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {bounty.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-                <Link to={`/bounties/${bounty.id}`}>
-                  <Button variant="outline" className="w-full bg-transparent">
-                    View Details
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <div className="text-gray-600 text-lg">Quering blockChain...</div>
       </div>
-    </>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="flex justify-between items-center mb-12">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Git Bounties</h1>
+          <p className="text-gray-600">Find and fix vulnerabilities to earn STX rewards</p>
+        </div>
+        <Link to="/post-bounty">
+          <Button>Post New Bounty</Button>
+        </Link>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {bounties.map((bounty) => (
+          <Card key={bounty.id} className="hover:shadow-lg transition-shadow duration-200">
+            <CardHeader>
+              <div className="flex justify-between items-start mb-2">
+                <CardTitle className="text-lg leading-tight">{bounty.title}</CardTitle>
+              </div>
+              <div className="flex items-center space-x-4 text-sm text-gray-500">
+                <div className="flex items-center space-x-1">
+                  <Coins className="h-4 w-4" />
+                  <span>{bounty.reward} STX</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Calendar className="h-4 w-4" />
+                  <span>{bounty.deadline}</span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4 line-clamp-2">{bounty.description}</p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {/* {bounty.priority?.map((tag) => ( */}
+                  {/* <Badge key={tag} variant="secondary" className="text-xs"> */}
+                  <Badge  variant="secondary" className="text-xs">
+                    {bounty.priority}
+                  </Badge>
+                {/* ))} */}
+              </div>
+              <Link to={`/bounties/${bounty.id}`}>
+                <Button variant="outline" className="w-full bg-transparent">
+                  View Details
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 };
 

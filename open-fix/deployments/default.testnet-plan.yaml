@@ -11,7 +11,7 @@ plan:
         - contract-publish:
             contract-name: bounty
             expected-sender: ST24PT28CZ0M6PKFWRNMTHVQSF8ZKCFQ6EEBGM2AP
-            cost: 9240
+            cost: 17590
             path: contracts/bounty.clar
             anchor-block-only: true
             clarity-version: 3

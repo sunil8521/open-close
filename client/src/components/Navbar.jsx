@@ -55,7 +55,7 @@ export function Navbar() {
           <Link to="/" className="flex items-center space-x-2">
             <Bug className="h-6 w-6 text-gray-700" />
             <span className="text-xl font-semibold text-gray-900">
-              Open-Close
+              Git Bounty
             </span>
           </Link>
 
