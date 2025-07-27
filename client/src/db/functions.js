@@ -1,4 +1,4 @@
-import { db, collection, addDoc } from './firebase';
+import { db, collection, addDoc,deleteDoc,doc} from './firebase';
 
 export async function saveOffchainBounty(data) {
   try {
@@ -16,3 +16,13 @@ export async function saveOffchainBounty(data) {
     console.error("Error adding document: ", e);
   }
 }
+
+
+export async function deleteOffchainBounty(id){
+  try {
+    await deleteDoc(doc(db, "bounties", id)); // "bounties" is your collection name
+  } catch (error) {
+    console.error("Error deleting document:", error);
+  }
+};
+
