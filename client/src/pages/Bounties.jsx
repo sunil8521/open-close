@@ -50,13 +50,15 @@ const Bounties = () => {
           const b = cvToValue(res);
           const refId = b.value["offchain-ref"].value;
           const reward = b.value["reward"].value;
+          const status = b.value["status"].value;
+
 
           // Fetch from Firebase using offchain-ref
           const docRef = doc(db, "bounties", refId);
           const docSnap = await getDoc(docRef);
 
           if (docSnap.exists()) {
-            bountyData.push({ id: i,reward, ...docSnap.data() });
+            bountyData.push({ id: i,reward,status, ...docSnap.data() });
           }
         }
 
@@ -119,7 +121,7 @@ const Bounties = () => {
                   </Badge>
                 {/* ))} */}
               </div>
-              <Link to={`/bounties/${bounty.id}`}>
+              <Link to={`/bounties/${bounty.id}`} state={bounty}>
                 <Button variant="outline" className="w-full bg-transparent">
                   View Details
                 </Button>
