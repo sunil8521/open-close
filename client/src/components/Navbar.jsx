@@ -21,7 +21,12 @@ import { Wallet, Bug, Menu, LogOut, Copy } from "lucide-react";
 
 export function Navbar() {
   const connectWallet = async () => {
-    await connect();
+    await connect({
+      appDetails: {
+      name: "Git Bounty",
+      icon: "https://cdn.pixabay.com/photo/2022/01/30/13/33/github-6980894_1280.png",
+      },
+    });
     window.location.reload();
   };
   const [isSheetOpen, setIsSheetOpen] = useState(false);
