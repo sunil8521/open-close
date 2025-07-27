@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import { saveOffchainBounty,deleteOffchainBounty } from "../db/functions";
 import {
   Select,
   SelectContent,
@@ -13,19 +16,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useSelector } from "react-redux";
-import { toast } from "sonner";
-import { saveOffchainBounty } from "../db/functions";
 import {
   Cl,
   makeContractCall,
   broadcastTransaction,
   stringAsciiCV,
   uintCV,
-  AnchorMode
+  AnchorMode,
 } from "@stacks/transactions";
-import { openContractCall } from '@stacks/connect';
-// import { StacksTestnet } from '@stacks/network';
+import { openContractCall, showConnect, request } from "@stacks/connect";
+import { STACKS_TESTNET } from "@stacks/network";
+import { PostConditionMode } from "@stacks/transactions";
+
 const Postbounty = () => {
   const [formData, setFormData] = useState({
     title: "",
@@ -37,35 +39,56 @@ const Postbounty = () => {
   });
 
   const { isConnected } = useSelector((state) => state.wallet);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isConnected) {
       toast.warning("Please connect your wallet.");
       return;
     }
-
-    // const offchainRef = await saveOffchainBounty(formData);
-    // console.log(offchainRef);
-    const functionArgs = [Cl.uint(1),Cl.stringAscii("BXzAxCOeSILIK4Ifaqfa")];
-
-    try {
-      const transaction = await makeContractCall({
-      contractAddress: "ST24PT28CZ0M6PKFWRNMTHVQSF8ZKCFQ6EEBGM2AP",
-      contractName: "bounty",  //create-bounty
-      functionName: "create-bounty",
-      functionArgs,
-      network:"testnet",
-      senderKey:"42c5f0a309c53025cdf7bf09a1544f3b91f932f396dfababa2e52daea7b230c301",
-      anchorMode: AnchorMode.Any,
-    });
-      // console.log(transaction)
-      const result = await broadcastTransaction({ transaction });
-      console.log("Transaction broadcasted. TxID:", result.txid);
-    } catch (err) {
-      console.error("Broadcast error:", err);
+    toast.info("Submitting bounty...");
+    const offchainRef = await saveOffchainBounty(formData);
+    if (!offchainRef) {
+      toast.error("Failed to save bounty. Try again.");
+      return;
     }
-  
+    try {
+      await request("stx_callContract", {
+        contract: "ST24PT28CZ0M6PKFWRNMTHVQSF8ZKCFQ6EEBGM2AP.bounty",
+        functionName: "create-bounty",
+        functionArgs: [Cl.uint(1), Cl.stringAscii(offchainRef)],
+        network: "testnet",
+        appDetails: {
+          name: "BitcoinStack Bounty",
+          icon: "https://bitcoinstack.app/icon.png",
+        },
+      });
+      toast.success("Bounty submitted!");
+      setFormData({
+        title: "",
+        description: "",
+        githubRepo: "",
+        reward: "",
+        priority: "",
+        deadline: "",
+      });
+    } catch (err) {
+      toast.error("Transaction failed or cancelled.");
+      // Delete bounty from Firebase if transaction fails
+      try {
+        await deleteOffchainBounty(offchainRef);
+      } catch (deleteErr) {
+        console.error("Failed to delete bounty from Firebase:", deleteErr);
+      }
+      setFormData({
+        title: "",
+        description: "",
+        githubRepo: "",
+        reward: "",
+        priority: "",
+        deadline: "",
+      });
+      console.error(err);
+    }
   };
 
   return (
@@ -85,7 +108,10 @@ const Postbounty = () => {
           <CardTitle>Bounty Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
             <div>
               <Label htmlFor="title">Bounty Title</Label>
               <Input
@@ -96,7 +122,7 @@ const Postbounty = () => {
                   setFormData({ ...formData, title: e.target.value })
                 }
                 className="mt-1"
-                // required
+                required
               />
             </div>
 
@@ -180,14 +206,13 @@ const Postbounty = () => {
             </div>
 
             <div className="flex space-x-4 pt-4">
-              <Button type="submit" className="flex-1">
-                Post Bounty
-              </Button>
+              <Button type="submit" className="flex-1">Post Bounty</Button>
               {/* <Button type="button" variant="outline" className="flex-1 bg-transparent">
                 Save Draft
               </Button> */}
             </div>
           </form>
+
         </CardContent>
       </Card>
     </div>
