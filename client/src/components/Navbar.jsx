@@ -49,7 +49,7 @@ export function Navbar() {
   const navItems = [
     { to: "/bounties", label: "Bounties" },
     { to: "/post-bounty", label: "Post Bounty" },
-    { to: "/admin", label: "Admin" },
+    // { to: "/admin", label: "Admin" },
   ];
 
   return (
