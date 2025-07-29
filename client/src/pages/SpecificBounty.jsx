@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Calendar, Coins, ExternalLink, Github, Satellite,Clock ,User} from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import SubmitFix from "@/components/SubmitFix";
 
 const SpecificBounty = () => {
   // const { id } = useParams();
@@ -96,11 +97,13 @@ const SpecificBounty = () => {
 
         {/* Compact Sidebar - Takes 1 column */}
         <div className="space-y-4">
+<SubmitFix bountyId={state.id} bountyTitle={state.title}/>
+
           {/* Primary Action */}
-          <Button className="w-full" size="lg">
+          {/* <Button className="w-full" size="lg">
             <Github className="h-4 w-4 mr-2" />
             Submit Fix
-          </Button>
+          </Button> */}
 
           {/* Quick Info Card */}
           <Card>

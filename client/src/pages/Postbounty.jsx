@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import { saveOffchainBounty,deleteOffchainBounty } from "../db/functions";
+import { saveOffchainBounty, deleteOffchainBounty } from "../db/functions";
 import {
   Select,
   SelectContent,
@@ -24,7 +24,7 @@ import {
   uintCV,
   AnchorMode,
 } from "@stacks/transactions";
-import { openContractCall, showConnect, request } from "@stacks/connect";
+import { request } from "@stacks/connect";
 import { STACKS_TESTNET } from "@stacks/network";
 import { PostConditionMode } from "@stacks/transactions";
 
@@ -37,6 +37,7 @@ const Postbounty = () => {
     priority: "",
     deadline: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const { isConnected } = useSelector((state) => state.wallet);
   const handleSubmit = async (e) => {
@@ -45,13 +46,19 @@ const Postbounty = () => {
       toast.warning("Please connect your wallet.");
       return;
     }
+
+    setLoading(true);
     toast.info("Submitting bounty...");
-    const offchainRef = await saveOffchainBounty(formData);
-    if (!offchainRef) {
-      toast.error("Failed to save bounty. Try again.");
-      return;
-    }
+
+    let offchainRef;
     try {
+      offchainRef = await saveOffchainBounty(formData);
+      if (!offchainRef) {
+        toast.error("Failed to save bounty. Try again.");
+        setLoading(false);
+        return;
+      }
+
       await request("stx_callContract", {
         contract: "ST24PT28CZ0M6PKFWRNMTHVQSF8ZKCFQ6EEBGM2AP.bounty",
         functionName: "create-bounty",
@@ -62,6 +69,7 @@ const Postbounty = () => {
           icon: "https://bitcoinstack.app/icon.png",
         },
       });
+
       toast.success("Bounty submitted!");
       setFormData({
         title: "",
@@ -74,10 +82,12 @@ const Postbounty = () => {
     } catch (err) {
       toast.error("Transaction failed or cancelled.");
       // Delete bounty from Firebase if transaction fails
-      try {
-        await deleteOffchainBounty(offchainRef);
-      } catch (deleteErr) {
-        console.error("Failed to delete bounty from Firebase:", deleteErr);
+      if (offchainRef) {
+        try {
+          await deleteOffchainBounty(offchainRef);
+        } catch (deleteErr) {
+          console.error("Failed to delete bounty from Firebase:", deleteErr);
+        }
       }
       setFormData({
         title: "",
@@ -88,6 +98,8 @@ const Postbounty = () => {
         deadline: "",
       });
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,10 +120,7 @@ const Postbounty = () => {
           <CardTitle>Bounty Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
-          >
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <Label htmlFor="title">Bounty Title</Label>
               <Input
@@ -206,13 +215,15 @@ const Postbounty = () => {
             </div>
 
             <div className="flex space-x-4 pt-4">
-              <Button type="submit" className="flex-1">Post Bounty</Button>
-              {/* <Button type="button" variant="outline" className="flex-1 bg-transparent">
-                Save Draft
-              </Button> */}
+              <Button
+                disabled={loading}
+                type="submit"
+                className="flex-1 cursor-pointer"
+              >
+                {loading ? "Submitting..." : "Post Bounty"}
+              </Button>
             </div>
           </form>
-
         </CardContent>
       </Card>
     </div>
