@@ -1,4 +1,4 @@
-# Open-Close: Blockchain-Based Issue Management Platform
+# Blockchain-Based Issue Management Platform
 
 A decentralized platform for posting and managing Github issues on the blockchain using React frontend and Stacks blockchain technology.
 
