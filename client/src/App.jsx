@@ -6,6 +6,7 @@ import { Navbar } from "./components/Navbar";
 import Postbounty from "./pages/Postbounty";
 import Bounties from "./pages/Bounties";
 import SpecificBounty from "./pages/SpecificBounty";
+import Mybounty from "./pages/Mybounty"
 import { useEffect } from "react";
 import { Toaster } from "sonner"; // or from "sonner" if not using shadcn/ui
 
@@ -42,6 +43,7 @@ function App() {
               <Route path="/post-bounty" element={<Postbounty />} />
               <Route path="/bounties" element={<Bounties />} />
               <Route path="/bounties/:id" element={<SpecificBounty />} />
+              <Route path="/mybounty" element={<Mybounty />} />
               <Route path="*" element={<Navigate to={"/"} />} />
             </Routes>
           </main>

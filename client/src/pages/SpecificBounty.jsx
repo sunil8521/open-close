@@ -97,7 +97,7 @@ const SpecificBounty = () => {
 
         {/* Compact Sidebar - Takes 1 column */}
         <div className="space-y-4">
-<SubmitFix bountyId={state.id} bountyTitle={state.title}/>
+<SubmitFix bountyId={state.id} bountyTitle={state.title} owner={state.owner}/>
 
           {/* Primary Action */}
           {/* <Button className="w-full" size="lg">

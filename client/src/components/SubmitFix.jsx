@@ -17,18 +17,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Github, Send } from "lucide-react"
+import {useSelector} from "react-redux"
 
-
-export function SubmitFix({ bountyTitle, bountyId }) {
+export function SubmitFix({ bountyTitle, bountyId,owner }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+    const { address,  } = useSelector((state) => state.wallet);
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    severity: "",
     githubPR: "",
-    reproductionSteps: "",
-    mitigation: "",
   })
 
   const handleSubmit = async (e) => {
@@ -44,24 +43,19 @@ export function SubmitFix({ bountyTitle, bountyId }) {
     setFormData({
       title: "",
       description: "",
-      severity: "",
       githubPR: "",
-      reproductionSteps: "",
-      mitigation: "",
     })
     setLoading(false)
     setOpen(false)
-
-    // Show success message (you can implement toast notification here)
-    // alert("Fix submitted successfully!")
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full" size="lg">
+
+        <Button className="w-full" size="lg" disabled={address==owner}>
           <Github className="h-4 w-4 mr-2" />
-          Submit Fix
+          {address==owner?"You can't Submit your own issue":"Submit Fix"}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -85,20 +79,7 @@ export function SubmitFix({ bountyTitle, bountyId }) {
             />
           </div>
 
-          {/* <div>
-            <Label htmlFor="severity">Severity Level</Label>
-            <Select value={formData.severity} onValueChange={(value) => setFormData({ ...formData, severity: value })}>
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Select severity level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Low">Low</SelectItem>
-                <SelectItem value="Medium">Medium</SelectItem>
-                <SelectItem value="High">High</SelectItem>
-                <SelectItem value="Critical">Critical</SelectItem>
-              </SelectContent>
-            </Select>
-          </div> */}
+
 
           <div>
             <Label htmlFor="description">Vulnerability Description</Label>
@@ -111,30 +92,6 @@ export function SubmitFix({ bountyTitle, bountyId }) {
               required
             />
           </div>
-
-          {/* <div>
-            <Label htmlFor="reproductionSteps">Steps to Reproduce</Label>
-            <Textarea
-              id="reproductionSteps"
-              placeholder="Step-by-step instructions to reproduce the vulnerability..."
-              value={formData.reproductionSteps}
-              onChange={(e) => setFormData({ ...formData, reproductionSteps: e.target.value })}
-              className="mt-1 min-h-[80px]"
-              required
-            />
-          </div> */}
-
-          {/* <div>
-            <Label htmlFor="mitigation">Suggested Mitigation</Label>
-            <Textarea
-              id="mitigation"
-              placeholder="Your recommended solution or mitigation strategy..."
-              value={formData.mitigation}
-              onChange={(e) => setFormData({ ...formData, mitigation: e.target.value })}
-              className="mt-1 min-h-[80px]"
-              required
-            />
-          </div> */}
 
           <div>
             <Label htmlFor="githubPR">GitHub Pull Request URL</Label>
