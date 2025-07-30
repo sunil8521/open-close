@@ -44,10 +44,7 @@ const Bounties = () => {
                   <Coins className="h-4 w-4" />
                   <span>{bounty.reward} STX</span>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>{bounty.deadline}</span>
-                </div>
+            
               </div>
             </CardHeader>
             <CardContent className={"flex flex-col h-fit"}>

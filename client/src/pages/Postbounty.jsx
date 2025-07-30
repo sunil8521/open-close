@@ -35,7 +35,6 @@ const Postbounty = () => {
     githubRepo: "",
     reward: "",
     priority: "",
-    deadline: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -62,7 +61,7 @@ const Postbounty = () => {
       await request("stx_callContract", {
         contract: "ST24PT28CZ0M6PKFWRNMTHVQSF8ZKCFQ6EEBGM2AP.bounty",
         functionName: "create-bounty",
-        functionArgs: [Cl.uint(1), Cl.stringAscii(offchainRef)],
+        functionArgs: [Cl.uint(parseInt(formData.reward)), Cl.stringAscii(offchainRef)],
         network: "testnet",
         appDetails: {
           name: "BitcoinStack Bounty",
@@ -77,11 +76,9 @@ const Postbounty = () => {
         githubRepo: "",
         reward: "",
         priority: "",
-        deadline: "",
       });
     } catch (err) {
       toast.error("Transaction failed or cancelled.");
-      // Delete bounty from Firebase if transaction fails
       if (offchainRef) {
         try {
           await deleteOffchainBounty(offchainRef);
@@ -89,14 +86,13 @@ const Postbounty = () => {
           console.error("Failed to delete bounty from Firebase:", deleteErr);
         }
       }
-      setFormData({
-        title: "",
-        description: "",
-        githubRepo: "",
-        reward: "",
-        priority: "",
-        deadline: "",
-      });
+      // setFormData({
+      //   title: "",
+      //   description: "",
+      //   githubRepo: "",
+      //   reward: "",
+      //   priority: "",
+      // });
       console.error(err);
     } finally {
       setLoading(false);
@@ -198,20 +194,6 @@ const Postbounty = () => {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-
-            <div>
-              <Label htmlFor="deadline">Submission Deadline</Label>
-              <Input
-                id="deadline"
-                type="date"
-                value={formData.deadline}
-                onChange={(e) =>
-                  setFormData({ ...formData, deadline: e.target.value })
-                }
-                className="mt-1"
-                // required
-              />
             </div>
 
             <div className="flex space-x-4 pt-4">

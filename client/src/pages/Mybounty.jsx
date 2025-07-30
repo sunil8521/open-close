@@ -6,7 +6,6 @@ import { Calendar, Edit, Eye, Users, Coins } from "lucide-react";
 import { useBounties } from "@/hooks/useBounties";
 import { useSelector } from "react-redux";
 
-
 function Mybounty() {
   const { address } = useSelector((state) => state.wallet);
 
@@ -34,7 +33,15 @@ function Mybounty() {
         : "outline";
     return <Badge variant={variant}>{priority}</Badge>;
   };
-
+  if (address == null) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <div className="text-gray-600 text-lg">
+          Connect you wallet to see deatils
+        </div>
+      </div>
+    );
+  }
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
@@ -97,28 +104,25 @@ function Mybounty() {
 
               <div className="flex items-center justify-between">
                 <div className="flex space-x-2">
-                  {/* <Link to={`/bounties/${bounty.id}`}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-transparent"
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
-                  </Link> */}
-
-                  <Link to={`/my-bounties/${bounty.id}/submissions`}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-transparent"
-                    >
-                      <Users className="h-4 w-4 mr-1" />
-
-                      View Submissions ({bounty.submissions})
-                    </Button>
-                  </Link>
+                  {bounty.submittedPRs.length == 0 ? (
+                       <Badge  variant="secondary" className="text-xs">
+                    {"No submissions"}
+                  </Badge>
+                  
+                  ) : (
+                    <>
+                      <Link to={`/my-bounties/${bounty.id}/submissions`}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="bg-transparent"
+                        >
+                          <Users className="h-4 w-4 mr-1" />
+                          View Submissions ({bounty.submittedPRs.length})
+                        </Button>
+                      </Link>
+                    </>
+                  )}
 
                   <Link to={`/my-bounties/${bounty.id}/edit`}>
                     <Button
