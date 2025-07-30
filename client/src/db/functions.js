@@ -35,7 +35,7 @@ export async function submitPRForBounty(bountyId, prData) {
     const prDocRef = await addDoc(collection(db, "prs"), {
       title: prData.title,
       description: prData.description,
-      prLink: prData.prLink,
+      githubPR: prData.githubPR,
       submitterAddress: prData.submitterAddress,
       bountyId: bountyId, // Reference back to bounty
       status: "pending", // pending, accepted, rejected
