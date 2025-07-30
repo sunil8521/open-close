@@ -6,13 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -22,6 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { Github, Send } from "lucide-react";
 import { useSelector } from "react-redux";
+import { submitPRForBounty } from "../db/functions";
+import { toast } from "sonner";
 
 export function SubmitFix({ bountyTitle, bountyId, owner }) {
   const [open, setOpen] = useState(false);
@@ -33,24 +28,36 @@ export function SubmitFix({ bountyTitle, bountyId, owner }) {
     description: "",
     githubPR: "",
   });
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (address===null) {
+      toast.warning("connect your wallet");
+      return;
+    }
+
     setLoading(true);
+    try {
+      await submitPRForBounty(bountyId, {
+        ...formData,
+        submitterAddress: address,
+      });
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+   
 
-    console.log("Submitted fix:", { bountyId, ...formData });
-
-    // Reset form and close dialog
-    setFormData({
-      title: "",
-      description: "",
-      githubPR: "",
-    });
-    setLoading(false);
-    setOpen(false);
+      // Reset form and close dialog
+      setFormData({
+        title: "",
+        description: "",
+        githubPR: "",
+      });
+      setOpen(false);
+    } catch (er) {
+      console.error(er);
+      toast.error("unable to submit.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

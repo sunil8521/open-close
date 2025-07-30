@@ -123,7 +123,6 @@ function Mybounty() {
                       </Link>
                     </>
                   )}
-
                   <Link to={`/my-bounties/${bounty.id}/edit`}>
                     <Button
                       variant="outline"
