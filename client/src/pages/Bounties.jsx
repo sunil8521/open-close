@@ -4,74 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Coins } from "lucide-react";
+import {useBounties} from "../hooks/useBounties"
 
-import {
-  fetchCallReadOnlyFunction,
-  cvToValue,
-  uintCV,
-} from "@stacks/transactions";
-
-import { getDoc, doc } from "firebase/firestore";
-import { db } from "@/db/firebase"; // Adjust path based on your project
 
 const Bounties = () => {
-  const contractAddress = "ST24PT28CZ0M6PKFWRNMTHVQSF8ZKCFQ6EEBGM2AP";
-  const contractName = "bounty";
-  const [bounties, setBounties] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchBounties = async () => {
-      setLoading(true);
-      try {
-        const response = await fetchCallReadOnlyFunction({
-          contractAddress,
-          contractName,
-          functionName: "get-bounty-counter",
-          functionArgs: [],
-          senderAddress: contractAddress,
-          network: "testnet",
-        });
-
-        const balance = cvToValue(response);
-        const total = parseInt(balance.value);
-        const bountyData = [];
-
-        for (let i = 1; i <= total; i++) {
-          const res = await fetchCallReadOnlyFunction({
-            contractAddress,
-            contractName,
-            functionName: "get-bounty",
-            functionArgs: [uintCV(i)],
-            senderAddress: contractAddress,
-            network: "testnet",
-          });
-
-          const b = cvToValue(res);
-          const refId = b.value["offchain-ref"].value;
-          const reward = b.value["reward"].value;
-          const status = b.value["status"].value;
+  const {bounties,error,loading}=useBounties()
 
 
-          // Fetch from Firebase using offchain-ref
-          const docRef = doc(db, "bounties", refId);
-          const docSnap = await getDoc(docRef);
-
-          if (docSnap.exists()) {
-            bountyData.push({ id: i,reward,status, ...docSnap.data() });
-          }
-        }
-
-        setBounties(bountyData);
-      } catch (err) {
-        console.error("Error fetching bounties:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBounties();
-  }, []);
 
   if (loading) {
     return (
@@ -100,7 +39,7 @@ const Bounties = () => {
               <div className="flex justify-between items-start mb-2">
                 <CardTitle className="text-lg leading-tight">{bounty.title}</CardTitle>
               </div>
-              <div className="flex items-center space-x-4 text-sm text-gray-500">
+              <div className="flex space-x-4 text-sm text-gray-500">
                 <div className="flex items-center space-x-1">
                   <Coins className="h-4 w-4" />
                   <span>{bounty.reward} STX</span>
@@ -111,7 +50,7 @@ const Bounties = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className={"flex flex-col h-fit"}>
               <p className="text-gray-600 mb-4 line-clamp-2">{bounty.description}</p>
               <div className="flex flex-wrap gap-2 mb-4">
                 {/* {bounty.priority?.map((tag) => ( */}
@@ -121,7 +60,7 @@ const Bounties = () => {
                   </Badge>
                 {/* ))} */}
               </div>
-              <Link to={`/bounties/${bounty.id}`} state={bounty}>
+              <Link to={`/bounties/${bounty.id}`} state={bounty} className="justisy-end" >
                 <Button variant="outline" className="w-full bg-transparent">
                   View Details
                 </Button>

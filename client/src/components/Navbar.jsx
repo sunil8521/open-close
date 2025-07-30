@@ -50,6 +50,7 @@ export function Navbar() {
     { to: "/bounties", label: "Bounties" },
     { to: "/post-bounty", label: "Post Bounty" },
     // { to: "/admin", label: "Admin" },
+    { to: "/mybounty", label: "My issues" },
   ];
 
   return (
