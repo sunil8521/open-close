@@ -27,10 +27,7 @@ const SpecificBounty = () => {
                 <Calendar className="h-4 w-4" />
                 <span>Posted {state.createdAt}</span>
               </div>
-              <div className="flex items-center space-x-1">
-                <Clock className="h-4 w-4" />
-                <span>Due {state.deadline}</span>
-              </div>
+         
               <Badge variant="outline" className="text-xs">
                 {state.priority}
               </Badge>
