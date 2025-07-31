@@ -11,6 +11,7 @@ import SubmitFix from "@/components/SubmitFix";
 const SpecificBounty = () => {
   // const { id } = useParams();
   const { state } = useLocation();
+  console.log(state.bountyId)
 
   return (
     <>
@@ -94,6 +95,7 @@ const SpecificBounty = () => {
 
         {/* Compact Sidebar - Takes 1 column */}
         <div className="space-y-4">
+          
 <SubmitFix bountyId={state.id} bountyTitle={state.title} owner={state.owner}/>
 
           {/* Primary Action */}
