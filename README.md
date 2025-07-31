@@ -5,16 +5,12 @@ A decentralized platform for posting and managing Github issues on the blockchai
 ## 📢 Current Status
 
 **What Works Now:**
+
 - ✅ **Post Issues/Bounties** - Create and submit new bounties directly to the blockchain
 - ✅ **View Issues/Bounties** - Browse and read all posted bounties from the blockchain
 - ✅ **Wallet Connection** - Connect your Leather/Hiro wallet to interact with the platform
-
-**What's Under Development:**
-- 🚧 Issue resolution and claiming system
-- 🚧 Payment and reward distribution
-- 🚧 GitHub repository integration
-
-> **Note:** This is currently a **posting and viewing platform**. You can create bounties and view them on the blockchain, but claiming/resolution features are still being developed.
+- ✅ **Submission Management** - View and manage submissions for bounties
+- ✅ **Bounty Resolution** - Approve or reject submissions 
 
 ## 🚀 Project Overview
 
@@ -25,15 +21,17 @@ This project allows users to create and manage issues/bounties directly on the b
 - Post new bounties/issues on the blockchain
 - Connect wallet (Leather/Hiro Wallet)
 - Store bounty metadata off-chain (Firebase)
-- View bounties (basic listing)
+- View bounties (comprehensive listing)
+- Submission management system
+- Bounty resolution and approval workflow
 
-🚧 **Under Development:**
+🔮 **Future Enhancements:**
 
-- Issue resolution and payout system
 - Advanced bounty filtering and search
-- User reputation system
-- Bounty claiming mechanism
-- Integration with GitHub repositories
+- User reputation and scoring system
+- Multi-signature approvals for large bounties
+- Mobile application development
+- Analytics and reporting dashboard
 
 ## 🛠 Tech Stack
 
@@ -210,10 +208,12 @@ The `bounty.clar` contract includes:
    - Wait for blockchain confirmation
    - Your bounty will be stored on-chain with metadata reference
 
-### Viewing Bounties
+### Viewing and Managing Bounties
 
 - Navigate to "Bounties" page to see all posted bounties
-- Each bounty shows basic information and blockchain transaction details
+- Each bounty shows detailed information and blockchain transaction details
+- Access submission management for your bounties
+- Review, approve, or reject submissions with detailed feedback
 
 ## 🔐 Contract Addresses
 
@@ -241,13 +241,13 @@ clarinet test
 
 ## 🚧 Roadmap
 
-- [ ] Implement bounty claiming mechanism
-- [ ] Add payment/escrow system
-- [ ] GitHub integration for automatic issue synchronization
-- [ ] User profile and reputation system
-- [ ] Advanced search and filtering
-- [ ] Multi-signature approvals for large bounties
-- [ ] Mobile-responsive design improvements
+- [ ] Advanced search and filtering with multiple criteria
+- [ ] User profile system with reputation scoring
+- [ ] Analytics dashboard for bounty performance
+- [ ] Mobile application for iOS and Android
+- [ ] Integration with additional version control systems
+- [ ] Multi-signature wallet support for large bounties
+- [ ] Automated testing and CI/CD pipeline improvements
 
 ## 🤝 Contributing
 
