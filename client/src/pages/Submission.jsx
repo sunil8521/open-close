@@ -14,6 +14,7 @@ import { getDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/db/firebase";
 import { request } from "@stacks/connect";
 import { useIssueWithPRs } from "../hooks/useIssueWithPRs";
+import { toast } from "sonner";
 export default function Submission() {
   const { id } = useParams();
   const { state } = useLocation();
@@ -34,17 +35,39 @@ export default function Submission() {
   };
   const sendSTX = async (address, PRid) => {
     try {
-      // const response = await request("stx_transferStx", {
-      //   amount: parseInt(state) * 1000000,
-      //   recipient: address, // recipient address
-      //   network: "testnet",
-      // });
+      toast.info("Processing STX transfer...");
+
+      await request("stx_transferStx", {
+        amount: parseInt(state) * 1000000,
+        recipient: address, // recipient address
+        network: "testnet",
+      });
+
       await updateDoc(doc(db, "prs", PRid), {
         status: "Approved",
       });
+
+      toast.success("Submission approved and STX transferred successfully!");
       refetch();
-    } catch (er) {
-      console.log(er);
+    } catch (error) {
+      console.error("Error approving submission:", error);
+      toast.error("Failed to approve submission. Please try again.");
+    }
+  };
+
+  const reject = async (PRid) => {
+    try {
+      toast.info("Processing rejection...");
+
+      await updateDoc(doc(db, "prs", PRid), {
+        status: "Rejected",
+      });
+
+      toast.success("Submission rejected successfully!");
+      refetch();
+    } catch (error) {
+      console.error("Error rejecting submission:", error);
+      toast.error("Failed to reject submission. Please try again.");
     }
   };
   return (
@@ -117,7 +140,13 @@ export default function Submission() {
                         <CheckCircle className="h-4 w-4 mr-1" />
                         Approve
                       </Button>
-                      <Button size="sm" variant="destructive">
+                      <Button
+                        onClick={() => {
+                          reject(submission.id);
+                        }}
+                        size="sm"
+                        variant="destructive"
+                      >
                         <XCircle className="h-4 w-4 mr-1" />
                         Reject
                       </Button>
