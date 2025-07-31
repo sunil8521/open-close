@@ -111,7 +111,7 @@ function Mybounty() {
                   
                   ) : (
                     <>
-                      <Link to={`/my-bounties/${bounty.id}/submissions`}>
+                      <Link to={`/my-bounties/${bounty.id}/submissions`} state={bounty.reward}>
                         <Button
                           variant="outline"
                           size="sm"
